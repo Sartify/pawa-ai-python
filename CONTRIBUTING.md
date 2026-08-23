@@ -2,6 +2,17 @@
 
 Thanks for helping improve the official Pawa AI Python SDK.
 
+> **Access control:** This is a public repo, but merges and releases are restricted. See [docs/GOVERNANCE.md](docs/GOVERNANCE.md) for branch protection, CODEOWNERS, and PyPI publish controls.
+
+## How to contribute
+
+1. **Fork** the repository (if you are not a maintainer)
+2. Create a feature branch from `main`
+3. Make changes and run the checks below
+4. Open a **Pull Request** — CI must pass and a code owner must approve before merge
+
+Direct pushes to `main` are blocked for non-maintainers.
+
 ## Development setup
 
 ```bash
@@ -28,8 +39,11 @@ GitHub Actions runs on every push and pull request to `main`:
 
 ## Releases
 
-1. Update the version in `pyproject.toml` and `src/pawa_ai/__init__.py`
-2. Create a GitHub Release with a tag like `v0.2.0`
-3. The **Publish to PyPI** workflow uploads the package automatically
+Releases are **maintainer-only** and require approval via the protected `pypi` GitHub Environment.
 
-Configure the `pypi` environment in GitHub with [Trusted Publishing](https://docs.pypi.org/trusted-publishers/) for `pawa-ai`.
+1. A maintainer updates the version in `pyproject.toml` and `src/pawa_ai/__init__.py` (via PR)
+2. After merge, a maintainer creates a GitHub Release with a semver tag like `v0.2.0`
+3. The **Publish to PyPI** workflow runs after required environment approval
+4. Configure Trusted Publishing on PyPI for `Sartify/pawa-ai-python` → `publish.yml` → environment `pypi`
+
+See [docs/GOVERNANCE.md](docs/GOVERNANCE.md) for the full access-control checklist.

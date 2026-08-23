@@ -1,0 +1,7 @@
+# Default owners for all files — required reviewers on every PR.
+* @Sartify/sdk-maintainers
+
+# CI/CD and release paths need maintainer approval.
+/.github/ @Sartify/sdk-maintainers
+/pyproject.toml @Sartify/sdk-maintainers
+/src/pawa_ai/__init__.py @Sartify/sdk-maintainers
