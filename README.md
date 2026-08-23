@@ -25,6 +25,8 @@ export PAWA_AI_API_KEY="your_api_key_here"
 
 Get your key from the [Builders Dashboard](https://builder.pawa-ai.com/dashboard?page=keys).
 
+See **[examples/](examples/)** for a full walkthrough from `pip install` to typed responses.
+
 ### Chat
 
 ```python
