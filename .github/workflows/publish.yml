@@ -13,7 +13,7 @@ jobs:
     name: Upload to PyPI
     runs-on: ubuntu-latest
     # Only publish semver release tags (e.g. v0.2.0)
-    if: github.event.release.tag_name =~ /^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$/
+    if: matches(github.event.release.tag_name, '^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$')
     environment:
       name: pypi
       url: https://pypi.org/p/pawa-ai
