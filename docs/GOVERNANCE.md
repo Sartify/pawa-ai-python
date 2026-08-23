@@ -6,7 +6,7 @@ This guide explains how to restrict who can change `main`, who can merge code, a
 
 ## Recommended roles
 
-Create a GitHub team (e.g. `sdk-maintainers`) under the **Sartify** organization.
+Create a GitHub team named **Pawa** under the **Sartify** organization (if it does not exist yet).
 
 | Role | GitHub permission | Who |
 |------|-------------------|-----|
@@ -43,17 +43,16 @@ Enable:
   - Required checks: `Lint`, `Test (Python 3.12)`, `Build package` (names from CI workflow)
 - [x] **Require branches to be up to date before merging**
 - [x] **Do not allow bypassing the above settings** (or limit bypass to org owners only)
-- [x] **Restrict who can push to matching branches** → select `sdk-maintainers` only  
+- [x] **Restrict who can push to matching branches** → select **Pawa** only  
   (Everyone else must use PRs; most external contributors use forks anyway.)
 - [x] **Block force pushes**
 - [x] **Block branch deletion**
 
 ### Create the team + CODEOWNERS
 
-1. Org **Settings → Teams → New team** → name it `sdk-maintainers`
+1. Org **Settings → Teams** → open or create the **Pawa** team
 2. Add core maintainers to the team
-3. This repo already includes `.github/CODEOWNERS` pointing at `@Sartify/sdk-maintainers`
-4. Adjust usernames/team name in `CODEOWNERS` if your org uses a different team slug
+3. This repo includes `.github/CODEOWNERS` pointing at `@Sartify/Pawa`
 
 ## Step 2 — Contribution workflow (external people)
 
@@ -78,7 +77,7 @@ Publishing is the highest-risk action. Use **two layers**:
 
 Configure:
 
-- [x] **Required reviewers** → add `sdk-maintainers` (1–2 people must approve each deploy)
+- [x] **Required reviewers** → add **Pawa** (1–2 people must approve each deploy)
 - **Deployment branches** → **Selected branches and tags** → allow only release tags, e.g. `v*`  
   Or restrict to tags matching semver: `v*.*.*`
 
@@ -132,7 +131,7 @@ gh api repos/Sartify/pawa-ai-python/branches/main/protection \
   --field required_status_checks='{"strict":true,"contexts":["Lint","Test (Python 3.12)","Build package"]}' \
   --field enforce_admins=true \
   --field required_pull_request_reviews='{"required_approving_review_count":1,"require_code_owner_reviews":true}' \
-  --field restrictions='{"users":[],"teams":["sdk-maintainers"],"apps":[]}' \
+  --field restrictions='{"users":[],"teams":["Pawa"],"apps":[]}' \
   --field required_linear_history=false \
   --field allow_force_pushes=false \
   --field allow_deletions=false
