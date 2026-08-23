@@ -1,6 +1,9 @@
 # Pawa AI Python SDK
 
 [![CI](https://github.com/Sartify/pawa-ai-python/actions/workflows/ci.yml/badge.svg)](https://github.com/Sartify/pawa-ai-python/actions/workflows/ci.yml)
+[![PyPI version](https://img.shields.io/pypi/v/pawa-ai.svg)](https://pypi.org/project/pawa-ai/)
+[![Python versions](https://img.shields.io/pypi/pyversions/pawa-ai.svg)](https://pypi.org/project/pawa-ai/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 Official Python library for the [Pawa AI API](https://docs.pawa-ai.com).
 
@@ -128,7 +131,7 @@ async def main():
                 {"role": "user", "content": [{"type": "text", "text": "Habari yako?"}]}
             ],
         )
-        print(response["data"])
+        print(response.text)
 
 asyncio.run(main())
 ```
