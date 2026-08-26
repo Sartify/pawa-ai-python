@@ -40,12 +40,11 @@ This script runs:
 
 | Example | What you get back |
 |---------|-------------------|
-| Chat | `ChatCompletion` with `.text` and optional `.usage` |
-| Streaming | Token deltas printed live, then full text via `.collect()` |
+| Chat | API JSON `dict` (`success`, `message`, `data`) |
+| Streaming | Token deltas printed live, then full dict via `.collect()` |
 | Embeddings | `EmbeddingResponse` with `.embeddings` (list of vectors) |
 | Models | `ModelList` with `.models` |
 | Error handling | Catches `AuthenticationError`, `RateLimitError`, etc. |
-| Raw JSON | Plain `dict` when you pass `raw=True` |
 | Async chat | Same as chat, using `AsyncPawaAI` |
 
 ## 4. Minimal chat example
@@ -65,7 +64,7 @@ response = client.chat.create(
     ],
 )
 
-print(response.text)
+print(response["data"]["request"][0]["message"]["content"])
 ```
 
 ## 5. More capabilities

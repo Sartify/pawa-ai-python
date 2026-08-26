@@ -25,7 +25,7 @@ export PAWA_AI_API_KEY="your_api_key_here"
 
 Get your key from the [Builders Dashboard](https://builder.pawa-ai.com/dashboard?page=keys).
 
-See **[examples/](examples/)** for a full walkthrough from `pip install` to typed responses.
+See **[examples/](examples/)** for a full walkthrough from `pip install` to API responses.
 
 ### Chat
 
@@ -45,8 +45,10 @@ response = client.chat.create(
     stream=False,
 )
 
-print(response.text)  # typed ChatCompletion response
-print(response.usage)  # token usage when available
+# Always a dict matching the API JSON
+print(response["success"])
+print(response["data"]["request"][0]["message"]["content"])
+print(response["data"].get("usage"))
 ```
 
 ### Streaming
@@ -64,7 +66,7 @@ with client.chat.create(
 
     # Or collect the full response after streaming
     completion = stream.collect()
-    print(completion.text)
+    print(completion["data"]["request"][0]["message"]["content"])
 ```
 
 Async streaming:
@@ -99,8 +101,6 @@ response = client.vectors.create(
 embeddings = response.embeddings
 ```
 
-Pass `raw=True` on any resource method to get the original JSON dict instead of typed models.
-
 ### Retries with exponential backoff
 
 ```python
@@ -133,7 +133,7 @@ async def main():
                 {"role": "user", "content": [{"type": "text", "text": "Habari yako?"}]}
             ],
         )
-        print(response.text)
+        print(response["data"]["request"][0]["message"]["content"])
 
 asyncio.run(main())
 ```
@@ -156,12 +156,12 @@ asyncio.run(main())
 ## Error handling
 
 ```python
-from pawa_ai import PawaAI, AuthenticationError, RateLimitError, ChatCompletion
+from pawa_ai import PawaAI, AuthenticationError, RateLimitError
 
 client = PawaAI()
 
 try:
-    completion: ChatCompletion = client.chat.create(model="pawa-v1-ember-20240924", messages=[...])
+    response = client.chat.create(model="pawa-v1-ember-20240924", messages=[...])
 except AuthenticationError as e:
     print(f"Auth failed: {e.message}")
 except RateLimitError as e:

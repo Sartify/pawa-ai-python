@@ -29,7 +29,7 @@ def require_api_key() -> str:
 
 
 def example_chat() -> None:
-    """Basic chat completion — returns a typed ChatCompletion response."""
+    """Basic chat completion — returns the API JSON as a dict."""
     from pawa_ai import PawaAI
 
     client = PawaAI()
@@ -56,12 +56,15 @@ def example_chat() -> None:
         stream=False,
     )
 
+    reply = response["data"]["request"][0]["message"]["content"]
+    usage = response["data"].get("usage") or {}
+
     print("=== Chat completion ===")
-    print(f"Success: {response.success}")
-    print(f"Model:   {response.model}")
-    print(f"Reply:   {response.text}")
-    if response.usage:
-        print(f"Tokens:  in={response.usage.tokens_in}, out={response.usage.tokens_out}")
+    print(f"Success: {response['success']}")
+    print(f"Model:   {response['data'].get('model')}")
+    print(f"Reply:   {reply}")
+    if usage:
+        print(f"Tokens:  in={usage.get('tokens_in')}, out={usage.get('tokens_out')}")
     print()
 
 
@@ -88,7 +91,9 @@ def example_streaming() -> None:
             print(delta, end="", flush=True)
 
         print()
-        print(f"Collected: {stream.collect().text[:80]}...")
+        collected = stream.collect()
+        reply = collected["data"]["request"][0]["message"]["content"]
+        print(f"Collected: {reply[:80]}...")
     print()
 
 
@@ -162,27 +167,7 @@ async def example_async_chat() -> None:
         )
 
     print("=== Async chat ===")
-    print(f"Reply: {response.text}")
-    print()
-
-
-def example_raw_response() -> None:
-    """Get the original JSON dict instead of typed models."""
-    from pawa_ai import PawaAI
-
-    client = PawaAI()
-
-    payload = client.chat.create(
-        model="pawa-v1-ember-20240924",
-        messages=[
-            {"role": "user", "content": [{"type": "text", "text": "Say hi in Swahili."}]}
-        ],
-        raw=True,
-    )
-
-    print("=== Raw JSON response ===")
-    print(f"Keys: {list(payload.keys())}")
-    print(f"Message field: {payload.get('message')}")
+    print(f"Reply: {response['data']['request'][0]['message']['content']}")
     print()
 
 
@@ -196,7 +181,6 @@ def main() -> None:
     example_embeddings()
     example_list_models()
     example_error_handling()
-    example_raw_response()
 
     asyncio.run(example_async_chat())
 

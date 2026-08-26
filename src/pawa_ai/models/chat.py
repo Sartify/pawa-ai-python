@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 
@@ -72,7 +72,6 @@ class ChatCompletion:
     object: str
     choices: list[ChatChoice]
     usage: Usage | None = None
-    raw: dict[str, Any] = field(repr=False, default_factory=dict)
 
     @classmethod
     def from_dict(cls, payload: dict[str, Any]) -> ChatCompletion:
@@ -87,7 +86,6 @@ class ChatCompletion:
             object=str(data.get("object", "")),
             choices=choices,
             usage=Usage.from_dict(data.get("usage")),
-            raw=payload,
         )
 
     @property
@@ -105,7 +103,6 @@ class ChatStreamChunk:
     message: str
     delta: str
     role: str | None = None
-    raw: dict[str, Any] = field(repr=False, default_factory=dict)
 
     @classmethod
     def from_dict(cls, payload: dict[str, Any]) -> ChatStreamChunk:
@@ -118,5 +115,4 @@ class ChatStreamChunk:
             message=str(payload.get("message", "")),
             delta=delta,
             role=message_data.get("role"),
-            raw=payload,
         )
