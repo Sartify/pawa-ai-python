@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-08-26
+
 ### Changed
 
 - `client.chat.create` and `client.agents.chat.create` always return the API JSON as a `dict` (no `raw=True` / `.raw`)
@@ -32,4 +34,5 @@ First public release on [PyPI](https://pypi.org/project/pawa-ai/).
 pip install pawa-ai
 ```
 
+[0.2.1]: https://github.com/Sartify/pawa-ai-python/releases/tag/v0.2.1
 [0.2.0]: https://github.com/Sartify/pawa-ai-python/releases/tag/v0.2.0
