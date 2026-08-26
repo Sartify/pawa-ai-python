@@ -2,9 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from pawa_ai._http import Stream, raise_for_status
+from pawa_ai._http import raise_for_status
 from pawa_ai._streaming import AsyncChatCompletionStream, ChatCompletionStream
-from pawa_ai.models.chat import ChatCompletion
 
 if TYPE_CHECKING:
     from pawa_ai._client import AsyncPawaAI, PawaAI
@@ -17,30 +16,24 @@ class ChatResource:
 
     def create(
         self,
-        *,
-        raw: bool = False,
         **params: Any,
-    ) -> ChatCompletion | ChatCompletionStream | Stream | dict[str, Any]:
+    ) -> dict[str, Any] | ChatCompletionStream:
         """Send a chat completion request.
 
-        Set ``stream=True`` to receive a :class:`ChatCompletionStream`.
-        Pass ``raw=True`` to receive untyped dict/Stream responses.
+        Returns the API JSON as a ``dict``. Set ``stream=True`` to receive a
+        :class:`ChatCompletionStream`.
         """
         stream = bool(params.get("stream"))
         response = self._client._post("/chat/request", json=params)
         if stream:
-            base_stream = Stream(response)
-            if raw:
-                return base_stream
-            return ChatCompletionStream(base_stream)
+            from pawa_ai._http import Stream
+
+            return ChatCompletionStream(Stream(response))
 
         raise_for_status(response)
-        payload = response.json()
-        if raw:
-            return payload
-        return ChatCompletion.from_dict(payload)
+        return response.json()
 
-    def completions(self, **params: Any) -> ChatCompletion | ChatCompletionStream | dict[str, Any]:
+    def completions(self, **params: Any) -> dict[str, Any] | ChatCompletionStream:
         """Alias for :meth:`create`."""
         return self.create(**params)
 
@@ -51,27 +44,19 @@ class AsyncChatResource:
 
     async def create(
         self,
-        *,
-        raw: bool = False,
         **params: ChatRequest | Any,
-    ) -> ChatCompletion | AsyncChatCompletionStream | dict[str, Any]:
+    ) -> dict[str, Any] | AsyncChatCompletionStream:
         stream = bool(params.get("stream"))
         response = await self._client._post("/chat/request", json=params)
         if stream:
             from pawa_ai._http import AsyncStream
 
-            base_stream = AsyncStream(response)
-            if raw:
-                return base_stream
-            return AsyncChatCompletionStream(base_stream)
+            return AsyncChatCompletionStream(AsyncStream(response))
 
         raise_for_status(response)
-        payload = response.json()
-        if raw:
-            return payload
-        return ChatCompletion.from_dict(payload)
+        return response.json()
 
     async def completions(
         self, **params: ChatRequest | Any
-    ) -> ChatCompletion | AsyncChatCompletionStream | dict[str, Any]:
+    ) -> dict[str, Any] | AsyncChatCompletionStream:
         return await self.create(**params)

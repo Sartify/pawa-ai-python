@@ -1,9 +1,28 @@
 from __future__ import annotations
 
 from collections.abc import AsyncIterator, Iterator
+from typing import Any
 
 from pawa_ai._http import AsyncStream, Stream
-from pawa_ai.models.chat import ChatCompletion, ChatStreamChunk
+from pawa_ai.models.chat import ChatStreamChunk
+
+
+def _collected_payload(text: str) -> dict[str, Any]:
+    return {
+        "success": True,
+        "message": "Stream collected",
+        "data": {
+            "request": [
+                {
+                    "finish_reason": "stop",
+                    "message": {"role": "assistant", "content": text},
+                }
+            ],
+            "created": "",
+            "model": "",
+            "object": "chat.request",
+        },
+    }
 
 
 class ChatCompletionStream:
@@ -26,8 +45,8 @@ class ChatCompletionStream:
 
     def chunks(self) -> Iterator[ChatStreamChunk]:
         """Yield typed stream chunks."""
-        for raw in self._stream:
-            yield ChatStreamChunk.from_dict(raw)
+        for payload in self._stream:
+            yield ChatStreamChunk.from_dict(payload)
 
     def text_deltas(self) -> Iterator[str]:
         """Yield only the text delta from each chunk."""
@@ -39,26 +58,9 @@ class ChatCompletionStream:
         """Collect all text deltas into a single string."""
         return "".join(self.text_deltas())
 
-    def collect(self) -> ChatCompletion:
-        """Build a :class:`ChatCompletion` from the full streamed text."""
-        text = self.collect_text()
-        return ChatCompletion.from_dict(
-            {
-                "success": True,
-                "message": "Stream collected",
-                "data": {
-                    "request": [
-                        {
-                            "finish_reason": "stop",
-                            "message": {"role": "assistant", "content": text},
-                        }
-                    ],
-                    "created": "",
-                    "model": "",
-                    "object": "chat.request",
-                },
-            }
-        )
+    def collect(self) -> dict[str, Any]:
+        """Build an API-shaped dict from the full streamed text."""
+        return _collected_payload(self.collect_text())
 
     def close(self) -> None:
         self._stream.close()
@@ -74,8 +76,8 @@ class AsyncChatCompletionStream:
         return self.chunks()
 
     async def chunks(self) -> AsyncIterator[ChatStreamChunk]:
-        async for raw in self._stream:
-            yield ChatStreamChunk.from_dict(raw)
+        async for payload in self._stream:
+            yield ChatStreamChunk.from_dict(payload)
 
     async def text_deltas(self) -> AsyncIterator[str]:
         async for chunk in self.chunks():
@@ -88,25 +90,8 @@ class AsyncChatCompletionStream:
             parts.append(delta)
         return "".join(parts)
 
-    async def collect(self) -> ChatCompletion:
-        text = await self.collect_text()
-        return ChatCompletion.from_dict(
-            {
-                "success": True,
-                "message": "Stream collected",
-                "data": {
-                    "request": [
-                        {
-                            "finish_reason": "stop",
-                            "message": {"role": "assistant", "content": text},
-                        }
-                    ],
-                    "created": "",
-                    "model": "",
-                    "object": "chat.request",
-                },
-            }
-        )
+    async def collect(self) -> dict[str, Any]:
+        return _collected_payload(await self.collect_text())
 
     async def close(self) -> None:
         await self._stream.close()

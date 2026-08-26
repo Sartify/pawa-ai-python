@@ -6,14 +6,12 @@ import pytest
 from pawa_ai import (
     AsyncPawaAI,
     AuthenticationError,
-    ChatCompletion,
     ChatCompletionStream,
     PawaAI,
     RetryConfig,
 )
 from pawa_ai._http import parse_stream_line, raise_for_status
 from pawa_ai._streaming import AsyncChatCompletionStream
-from pawa_ai.models.chat import ChatCompletion as ChatCompletionModel
 from pawa_ai.models.chat import ChatStreamChunk
 
 
@@ -38,7 +36,7 @@ def test_client_builds_auth_header():
     assert client._http_client is not None
 
 
-def test_chat_create_returns_typed_model():
+def test_chat_create_returns_dict():
     payload = {
         "success": True,
         "message": "Chat request processed successfully",
@@ -69,24 +67,10 @@ def test_chat_create_returns_typed_model():
         messages=[{"role": "user", "content": [{"type": "text", "text": "Hi"}]}],
         stream=False,
     )
-    assert isinstance(response, ChatCompletion)
-    assert response.success is True
-    assert response.text == "Hello there"
-    assert response.usage is not None
-    assert response.usage.tokens_in == 10
-
-
-def test_chat_create_raw_response():
-    payload = {"success": True, "message": "ok", "data": {}}
-    transport = httpx.MockTransport(lambda request: httpx.Response(200, json=payload))
-    client = PawaAI(api_key="test-key", http_client=httpx.Client(transport=transport))
-
-    response = client.chat.create(
-        model="pawa-v1-ember-20240924",
-        messages=[{"role": "user", "content": [{"type": "text", "text": "Hi"}]}],
-        raw=True,
-    )
+    assert isinstance(response, dict)
     assert response["success"] is True
+    assert response["data"]["request"][0]["message"]["content"] == "Hello there"
+    assert response["data"]["usage"]["tokens_in"] == 10
 
 
 def test_raise_for_status_maps_errors():
@@ -122,8 +106,8 @@ def test_stream_helpers():
         messages=[{"role": "user", "content": [{"type": "text", "text": "Hi"}]}],
         stream=True,
     ).collect()
-    assert isinstance(collected, ChatCompletionModel)
-    assert collected.text == "Hello"
+    assert isinstance(collected, dict)
+    assert collected["data"]["request"][0]["message"]["content"] == "Hello"
 
 
 @pytest.mark.asyncio
@@ -153,7 +137,7 @@ async def test_async_chat_create_success():
             model="pawa-v1-ember-20240924",
             messages=[{"role": "user", "content": [{"type": "text", "text": "Hi"}]}],
         )
-        assert response.text == "A"
+        assert response["data"]["request"][0]["message"]["content"] == "A"
 
 
 @pytest.mark.asyncio
@@ -198,7 +182,6 @@ def test_retry_on_rate_limit():
         response = client.chat.create(
             model="pawa-v1-ember-20240924",
             messages=[{"role": "user", "content": [{"type": "text", "text": "Hi"}]}],
-            raw=True,
         )
 
     assert attempts["count"] == 2

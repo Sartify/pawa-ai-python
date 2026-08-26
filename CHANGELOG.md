@@ -5,6 +5,13 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- `client.chat.create` and `client.agents.chat.create` always return the API JSON as a `dict` (no `raw=True` / `.raw`)
+- `stream.collect()` returns a dict in the same shape as a non-streaming chat response
+
 ## [0.2.0] - 2026-08-23
 
 First public release on [PyPI](https://pypi.org/project/pawa-ai/).
