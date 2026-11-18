@@ -32,6 +32,7 @@ client = PawaAI(api_key="your_api_key_here")
 
 ## 3. Run the examples
 
+### Comprehensive suite
 ```bash
 python examples/getting_started.py
 ```
@@ -46,6 +47,27 @@ This script runs:
 | Models | `ModelList` with `.models` |
 | Error handling | Catches `AuthenticationError`, `RateLimitError`, etc. |
 | Async chat | Same as chat, using `AsyncPawaAI` |
+
+### Specialized feature examples
+
+Run dedicated standalone scripts:
+
+- **Tools Calling**:
+  ```bash
+  python examples/tools_calling.py
+  ```
+- **RAG (Retrieval-Augmented Generation)**:
+  ```bash
+  python examples/rag_example.py
+  ```
+- **Agentic RAG & Autonomous Agents**:
+  ```bash
+  python examples/agentic_rag.py
+  ```
+- **Structured Output (JSON Schema)**:
+  ```bash
+  python examples/structured_output.py
+  ```
 
 ## 4. Minimal chat example
 

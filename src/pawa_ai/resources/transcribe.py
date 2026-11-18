@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import builtins
 from typing import TYPE_CHECKING, Any
 
 from pawa_ai._http import build_multipart_files, raise_for_status
@@ -47,7 +48,7 @@ class WorkspacesResource:
         self,
         workspace_id: int,
         *,
-        files: list[str | bytes | tuple[str, bytes, str | None]],
+        files: builtins.list[str | bytes | tuple[str, bytes, str | None]],
     ) -> dict[str, Any]:
         multipart_files = build_multipart_files("files", files)
         response = self._client._post(
@@ -132,7 +133,7 @@ class AsyncWorkspacesResource:
         self,
         workspace_id: int,
         *,
-        files: list[str | bytes | tuple[str, bytes, str | None]],
+        files: builtins.list[str | bytes | tuple[str, bytes, str | None]],
     ) -> dict[str, Any]:
         multipart_files = build_multipart_files("files", files)
         response = await self._client._post(
