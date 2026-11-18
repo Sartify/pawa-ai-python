@@ -101,6 +101,137 @@ response = client.vectors.create(
 embeddings = response.embeddings
 ```
 
+### Tools Calling (Function Calling)
+
+Define function schemas and let models invoke tools (run `python examples/tools_calling.py` for full sample):
+
+```python
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_weather",
+            "description": "Get current weather conditions for a city",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "city": {"type": "string", "description": "e.g. Dar es Salaam, Nairobi"},
+                },
+                "required": ["city"],
+            },
+        },
+    }
+]
+
+response = client.chat.create(
+    model="pawa-v1-blaze-20250318",
+    messages=[
+        {"role": "user", "content": [{"type": "text", "text": "What's the weather in Dar es Salaam?"}]}
+    ],
+    tools=tools,
+)
+
+message = response["data"]["request"][0]["message"]
+tool_calls = message.get("tool_calls", [])
+for call in tool_calls:
+    print(f"Tool to invoke: {call['function']['name']}, args: {call['function']['arguments']}")
+```
+
+### RAG (Retrieval-Augmented Generation)
+
+Ground chat completions using your existing Pawa AI Knowledge Bases (see `examples/rag_example.py`):
+
+```python
+# Ground chat responses using a knowledge base ID from your dashboard
+response = client.chat.create(
+    model="pawa-v1-ember-20240924",
+    messages=[
+        {
+            "role": "user",
+            "content": [{"type": "text", "text": "Eleza kuhusu hisa na huduma zake"}],
+        }
+    ],
+    rag={
+        "knowledgeBaseId": 81,  # ID of your knowledge base
+        "topK": 3,
+    },
+)
+
+print(response["data"]["request"][0]["message"]["content"])
+```
+
+You can also run direct semantic retrieval on knowledge bases:
+
+```python
+results = client.storage.knowledge_base.semantic_retrieval(
+    query="Hisa na huduma za soko",
+    knowledgeBaseId=81,
+    top_k=3,
+)
+```
+
+### Agentic RAG & Autonomous Agents
+
+Configure and chat with intelligent agents equipped with tools and knowledge bases (see `examples/agentic_rag.py`):
+
+```python
+# 1. Create an agent with specific instructions and description
+agent = client.agents.create(
+    name="Customer Support Agent",
+    description="Handles customer inquiries grounded in documentation",
+    instruction="Answer queries strictly based on connected knowledge bases and policies.",
+)
+
+# 2. Chat directly with the agent
+agent_chat = client.agents.chat.create(
+    name="Customer Support Agent",
+    description="Handles customer inquiries grounded in documentation",
+    instruction="Answer queries strictly based on connected knowledge bases and policies.",
+    message={"role": "user", "content": [{"type": "text", "text": "Msaada kuhusu akaunti"}]},
+    model="pawa-v1-blaze-20250318",
+    agents=[agent["data"]["id"]],
+)
+print(agent_chat["data"]["request"][0]["message"]["content"])
+```
+
+### Structured Output
+
+Enforce strict JSON schemas in model responses (see `examples/structured_output.py`):
+
+```python
+import json
+
+response_format = {
+    "type": "json_schema",
+    "json_schema": {
+        "name": "contact_info",
+        "strict": True,
+        "schema": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "email": {"type": "string"},
+                "role": {"type": "string"},
+            },
+            "required": ["name", "email", "role"],
+            "additionalProperties": False,
+        },
+    },
+}
+
+response = client.chat.create(
+    model="pawa-v1-ember-20240924",
+    messages=[
+        {"role": "user", "content": [{"type": "text", "text": "Extract: Juma Ally, Lead Engineer at juma@example.com"}]}
+    ],
+    response_format=response_format,
+)
+
+content = response["data"]["request"][0]["message"]["content"]
+data = json.loads(content)
+print(data["name"], data["email"], data["role"])
+```
+
 ### Retries with exponential backoff
 
 ```python
